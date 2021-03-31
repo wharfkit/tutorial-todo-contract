@@ -34,6 +34,10 @@ deploy-contract: contract
 	cleos -u $(NODE_URL) set contract \
 		$(CONTRACT_ACCOUNT) contract/ ${CONTRACT}.wasm ${CONTRACT}.abi
 
+.PHONY: deploy-pages
+deploy-pages: build
+	@${BIN}/gh-pages -d build
+
 .PHONY: check
 check: node_modules
 	@${BIN}/svelte-check
@@ -51,6 +55,7 @@ clean:
 	rm -f contract/*.abi
 	rm -f contract/*.wasm
 	rm -f src/contract-types.ts
+	rm rf node_modules/.cache
 
 .PHONY: distclean
 distclean: clean
