@@ -55,7 +55,7 @@ clean:
 	rm -f contract/*.abi
 	rm -f contract/*.wasm
 	rm -f src/contract-types.ts
-	rm rf node_modules/.cache
+	rm -rf node_modules/.cache
 
 .PHONY: distclean
 distclean: clean

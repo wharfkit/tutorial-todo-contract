@@ -24,6 +24,7 @@ module.exports = {
     routes: [{match: 'routes', src: '.*', dest: '/index.html'}],
     buildOptions: {
         sourcemap: !isProductionBuild,
+        baseUrl: '/dapp-template',
     },
     plugins: [
         [
