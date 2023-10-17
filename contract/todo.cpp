@@ -17,10 +17,14 @@ public:
         name author;
         time_point timestamp;
         string description;
+        uint64_t completed;  // Use uint64_t for completed status: 0 for incomplete, 1 for completed
         uint64_t primary_key() const { return id; }
+        uint64_t get_completed() const { return completed; }  // Getter for the secondary index
     };
-    typedef eosio::multi_index<name("todos"), todo_row>
-        todos_table;
+
+    typedef eosio::multi_index<name("todos"), todo_row, 
+        indexed_by<name("completedidx"), const_mem_fun<todo_row, uint64_t, &todo_row::get_completed>>>
+        todos_table;  // Secondary index for the "completed" field
 
     todo_contract(name receiver, name code, datastream<const char *> ds)
         : contract(receiver, code, ds)
@@ -30,12 +34,13 @@ public:
     [[eosio::action]] void add(name author, string description)
     {
         require_auth(author);
-        todos_table todos(_self, author.value);  // Use author as scope
+        todos_table todos(_self, author.value);
         todos.emplace(author, [&](todo_row &row) {
             row.id = todos.available_primary_key();
             row.author = author;
             row.timestamp = current_time_point();
             row.description = description;
+            row.completed = 0;  // Default value for new todos (0 means incomplete)
         });
         auto last = todos.rbegin();
         if (last->id >= MAX_TODOS)
@@ -47,17 +52,29 @@ public:
     [[eosio::action]] void erase(name author, uint64_t id)
     {
         require_auth(author);
-        todos_table todos(_self, author.value);  // Use author as scope
+        todos_table todos(_self, author.value);
         auto itr = todos.find(id);
         check(itr != todos.end(), "Todo not found");
         check(itr->author == author, "You are not the author");
         todos.erase(itr);
     }
 
+    [[eosio::action]] void markcomplete(name author, uint64_t id)
+    {
+        require_auth(author);
+        todos_table todos(_self, author.value);
+        auto itr = todos.find(id);
+        check(itr != todos.end(), "Todo not found");
+        check(itr->author == author, "You are not the author");
+        todos.modify(itr, author, [&](todo_row &row) {
+            row.completed = 1;  // Marking the todo as completed (1 means completed)
+        });
+    }
+
     [[eosio::action]] void eraseall(name author)
     {
         require_auth(author);
-        todos_table todos(_self, author.value);  // Use author as scope
+        todos_table todos(_self, author.value);
         auto itr = todos.begin();
         while (itr != todos.end())
         {
