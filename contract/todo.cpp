@@ -35,7 +35,7 @@ public:
     {
         require_auth(author);
         todos_table todos(_self, author.value);
-        todos.emplace(author, [&](todo_row &row) {
+        todos.emplace(_self, [&](todo_row &row) {  // Contract pays for RAM
             row.id = todos.available_primary_key();
             row.author = author;
             row.timestamp = current_time_point();
@@ -66,7 +66,7 @@ public:
         auto itr = todos.find(id);
         check(itr != todos.end(), "Todo not found");
         check(itr->author == author, "You are not the author");
-        todos.modify(itr, author, [&](todo_row &row) {
+        todos.modify(itr, _self, [&](todo_row &row) {  // Contract pays for RAM
             row.completed = 1;  // Marking the todo as completed (1 means completed)
         });
     }
