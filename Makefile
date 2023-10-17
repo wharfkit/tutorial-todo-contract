@@ -1,10 +1,9 @@
 BIN := ./node_modules/.bin
 
 .EXPORT_ALL_VARIABLES:
-CONTRACT ?= hello
+CONTRACT ?= todo
 CONTRACT_ACCOUNT ?= $(CONTRACT).gm
-NODE_URL ?= https://jungle3.greymass.com
-CHAIN_ID ?= 2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840
+NODE_URL ?= https://jungle4.greymass.com
 REV := $(shell git rev-parse --short HEAD)
 BRANCH := $(shell echo $${HEAD:-$$(git branch --show-current)})
 
