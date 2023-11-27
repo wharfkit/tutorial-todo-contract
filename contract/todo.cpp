@@ -31,11 +31,11 @@ public:
     {
     }
 
-    [[eosio::action]] void add(name author, string description)
+    [[eosio::action]] todo_row add(name author, string description)
     {
         require_auth(author);
         todos_table todos(_self, author.value);
-        todos.emplace(_self, [&](todo_row &row) {  // Contract pays for RAM
+        auto itr = todos.emplace(_self, [&](todo_row &row) {  // Contract pays for RAM
             row.id = todos.available_primary_key();
             row.author = author;
             row.timestamp = current_time_point();
@@ -47,6 +47,7 @@ public:
         {
             todos.erase(todos.begin());
         }
+        return *itr;
     }
 
     [[eosio::action]] void erase(name author, uint64_t id)
