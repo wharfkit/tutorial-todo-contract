@@ -55,7 +55,7 @@ public:
         require_auth(author);
         todos_table todos(_self, author.value);
         auto itr = todos.find(id);
-        check(itr != todos.end(), "Todo not found");
+        check(itr != todos.end(), "Todo was not found");
         check(itr->author == author, "You are not the author");
         todos.erase(itr);
     }
@@ -65,7 +65,7 @@ public:
         require_auth(author);
         todos_table todos(_self, author.value);
         auto itr = todos.find(id);
-        check(itr != todos.end(), "Todo not found");
+        check(itr != todos.end(), "Todo was not found");
         check(itr->author == author, "You are not the author");
         todos.modify(itr, _self, [&](todo_row &row) {  // Contract pays for RAM
             row.completed = complete ? 1 : 0;  // Set the todo as completed (1) or incomplete (0) based on the boolean value
